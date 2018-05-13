@@ -36,7 +36,7 @@ article, aside, canvas, details, figcaption, figure, footer, header, hgroup, men
 	display: block;
 }
 #maincontent {
-  padding-top: 130px;
+  padding-top: 80px;
   background-color: #f3f3f3;
   min-height: 100%;
 }
@@ -55,6 +55,8 @@ nav {
   height: 80px;
   background-color: #252831;
   text-align:center;
+  position: fixed;
+  z-index: 200;
 }
 nav h1 {
   margin: auto;
@@ -71,7 +73,7 @@ nav h1 a {
     list-style: none;
     background-color: #eee;
     font-size: 17px;
-    margin: 0;
+    margin-top: 80px;
     width: 100%;
 }
 
