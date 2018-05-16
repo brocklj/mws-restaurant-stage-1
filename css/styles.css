@@ -228,7 +228,10 @@ nav h1 a {
   line-height: 1.1;
 }
 #restaurant-img {
-	width: 100%;
+  width: 100%;
+  margin-left: auto;
+  margin-right: auto;
+  display: block;
 }
 #restaurant-address {
   font-size: 12pt;
@@ -300,4 +303,5 @@ nav h1 a {
   .filter-options {
     flex-flow: row wrap;
   }
+
 }

@@ -16,13 +16,19 @@ module.exports = function(grunt) {
           sizes: [{
             /* Change these */
             width: 800,
-            suffix: '_2x',
+            suffix: '-800w',
             quality: 80
           },
           {
             /* Change these */
             width: 400,
-            suffix: '_1x',
+            suffix: '-400w',
+            quality: 80
+          },
+          {
+            /* Change these */
+            width: 320,
+            suffix: '-320w',
             quality: 80
           }
         
