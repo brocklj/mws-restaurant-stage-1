@@ -305,3 +305,9 @@ nav h1 a {
   }
 
 }
+
+@media (screenreader: none) {
+  #map-container {
+    display: none;
+  }
+}
