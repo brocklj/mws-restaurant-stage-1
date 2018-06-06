@@ -1,71 +1,72 @@
-var staticCacheName = 'rest-static-v10';
-var contentImgsCache = 'rest-content-imgs';
+var contentCache = 'restaurant-stage1-v2';
+var imageCache = 'restaurant-stage1-imgs';
+
 var allCaches = [
-  staticCacheName,
-  contentImgsCache
+    contentCache,
+    imageCache
 ];
 
-self.addEventListener('install', function(event) { 
-  event.waitUntil(
-    caches.open(staticCacheName).then(function(cache) {
-      return cache.addAll([
-        '/',
-        '/js/main.js',
-        '/js/restaurant_info.js',
-        '/js/dbhelper.js',
-        '/css/styles.css'
-      ]);
-    })
-  );
-});
-
-self.addEventListener('activate', function(event) {
-  event.waitUntil(
-    caches.keys().then(function(cacheNames) {
-      return Promise.all(
-        cacheNames.filter(function(cacheName) {
-          return cacheName.startsWith('rest-') &&
-                 !allCaches.includes(cacheName);
-        }).map(function(cacheName) {
-          return caches.delete(cacheName);
+self.addEventListener('install', function(e){
+    e.waitUntil(
+        caches.open(contentCache).then(function(cache){
+            return cache.addAll([
+                '/',
+                '/js/main.js',
+                '/js/restaurant_info.js',
+                '/js/dbhelper.js',
+                '/css/styles.css'
+            ])
         })
-      );
-    })
-  );
+    )
 });
 
-self.addEventListener('fetch', function(event) {
-  var requestUrl = new URL(event.request.url);  
-  if (requestUrl.origin === location.origin) {
-    if (requestUrl.pathname === '/') {
-      event.respondWith(caches.match('/'));
-      return;
-    }
-    if (requestUrl.pathname.startsWith('/images/')) {
-      event.respondWith(servePhoto(event.request));
-      return;
-    }
-  }
+self.addEventListener('activate', function(e){
+    e.waitUntil(
+        caches.keys().then(function(cacheNames){
+            return Promise.all(
+                cacheNames.filter(function(name){
+                    return name.startsWith('restaurant-') &&
+                        !allCaches.includes(name);
+                })
+                .map(function(name){
+                    return caches.delete(name);
+                })
+            );
+        })
+    );
+});
 
-  event.respondWith(
-    caches.match(event.request).then(function(response) {
-      return response || fetch(event.request)  .catch(function(err) {       // fallback mechanism           
+self.addEventListener('fetch', function(e) {
+    let url = new URL(e.request.url);  
+    if (url.origin === location.origin) {
+      if (url.pathname === '/') {
+        e.respondWith(caches.match('/'));
+        return;
+      }
+      if (url.pathname.startsWith('/images/')) {
+        e.respondWith(getImage(e.request));
+        return;
+      }
+    }
+    e.respondWith(
+      caches.match(e.request).then(function(response) {
+        return response || fetch(e.request).catch(function(err) {
+                console.log(err);       // fallback mechanism           
             });
-    })
-  );
-});
+      })
+    );
+  });
 
-function servePhoto(request) {
-  var storageUrl = request.url.replace(/-\d+px\.jpg$/, '');
-
-  return caches.open(contentImgsCache).then(function(cache) {
-    return cache.match(storageUrl).then(function(response) {
-      if (response) return response;
-
-      return fetch(request).then(function(networkResponse) {
-        cache.put(storageUrl, networkResponse.clone());
-        return networkResponse;
+  function getImage(request) {
+    var storageUrl = request.url.replace(/-\d+px\.jpg$/, '');
+  
+    return caches.open(imageCache).then(function(cache) {
+      return cache.match(storageUrl).then(function(response) {
+        if (response) return response;
+        return fetch(request).then(function(serverResponse) {
+          cache.put(storageUrl, serverResponse.clone());
+          return serverResponse;
+        });
       });
     });
-  });
-}
+  }
