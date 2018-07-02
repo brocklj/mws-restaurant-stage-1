@@ -167,6 +167,8 @@ createRestaurantHTML = (restaurant) => {
   const image = document.createElement('img');
   image.className = 'restaurant-img';
   image.alt = restaurant.name;
+  image.srcset = DBHelper.imageSrcSetForRestaurant(restaurant);
+  image.sizes = '(max-width: 480px) 30vw, (max-width: 512px) 50vw, 100vw';
   image.src = DBHelper.imageUrlForRestaurant(restaurant);
   li.append(image);
 
@@ -186,11 +188,11 @@ createRestaurantHTML = (restaurant) => {
 
   const more = document.createElement('a');
   more.innerHTML = 'View Details';
-  more.setAttribute('aria-labelledby', "top"+restaurant.id);
+  more.setAttribute('aria-labelledby', 'View details of "' + restaurant.name + '"');
   more.href = DBHelper.urlForRestaurant(restaurant);
   li.append(more)
 
-  return li
+  return li;
 }
 
 /**
