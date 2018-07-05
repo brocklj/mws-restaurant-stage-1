@@ -17,14 +17,19 @@ class DBHelper {
    */
   static fetchRestaurants(callback) {
     let req = new Request(DBHelper.DATABASE_URL + '/restaurants/');  
-    fetch(req).then((res)=>{
-      if(res.ok){
-        res.json().then((restaurants) => callback(null,restaurants));  
-      } else {
-        const error = (`Request failed. Returned status of ${res.status}`);
+    fetch(req)
+      .then((res)=>{
+        if(res.ok){
+          res.json().then((restaurants) => callback(null,restaurants));  
+        } else {
+          const error = (`Request failed. Returned status of ${res.status}`);
+          callback(error, null);
+        }     
+      })
+      .catch((reason)=>{
+        const error = (`Promise rejected. reason: ${reason}`);
         callback(error, null);
-      }     
-    });  
+      });  
   }
 
   /**
@@ -33,13 +38,18 @@ class DBHelper {
   static fetchRestaurantById(id, callback) {
     // fetch all restaurants with proper error handling.
     let req = new Request(DBHelper.DATABASE_URL + '/restaurants/' + id);  
-    fetch(req).then((res)=>{
-      if(res.ok){
-        res.json().then((restaurant) => callback(null, restaurant));  
-      } else {
-        callback('Restaurant does not exist', null);
-      }     
-    });  
+    fetch(req)
+      .then((res)=>{
+        if(res.ok){
+          res.json().then((restaurant) => callback(null, restaurant));  
+        } else {
+          callback('Restaurant does not exist', null);
+        }     
+      })
+      .catch((reason)=>{
+        const error = (`Promise rejected. reason: ${reason}`);
+        callback(error, null);
+      });    
   }
 
   /**
