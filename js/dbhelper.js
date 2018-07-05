@@ -156,11 +156,11 @@ class DBHelper {
   }
 
   static imageSrcSetForRestaurant(restaurant){
-    let imgNameType = restaurant.photograph.split('.');
+    let imgNameType = restaurant.photograph || 0;
     return (`
-      /images/${imgNameType[0]}-320-320w.${imgNameType[1]} 320w,
-      /images/${imgNameType[0]}-400-400w.${imgNameType[1]} 400w,
-      /images/${imgNameType[0]}-800-800w.${imgNameType[1]} 800w
+      /images/${imgNameType}-320-320w.jpg 320w,
+      /images/${imgNameType}-400-400w.jpg 400w,
+      /images/${imgNameType}-800-800w.jpg 800w
     `);
   }
 
