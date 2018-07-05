@@ -21,7 +21,7 @@ class DBHelper {
       if(res.ok){
         res.json().then((restaurants) => callback(null,restaurants));  
       } else {
-        const error = (`Request failed. Returned status of ${xhr.status}`);
+        const error = (`Request failed. Returned status of ${res.status}`);
         callback(error, null);
       }     
     });  
@@ -32,18 +32,14 @@ class DBHelper {
    */
   static fetchRestaurantById(id, callback) {
     // fetch all restaurants with proper error handling.
-    DBHelper.fetchRestaurants((error, restaurants) => {
-      if (error) {
-        callback(error, null);
+    let req = new Request(DBHelper.DATABASE_URL + '/restaurants/' + id);  
+    fetch(req).then((res)=>{
+      if(res.ok){
+        res.json().then((restaurant) => callback(null, restaurant));  
       } else {
-        const restaurant = restaurants.find(r => r.id == id);
-        if (restaurant) { // Got the restaurant
-          callback(null, restaurant)
-        } else { // Restaurant does not exist in the database
-          callback('Restaurant does not exist', null);
-        }
-      }
-    });
+        callback('Restaurant does not exist', null);
+      }     
+    });  
   }
 
   /**
