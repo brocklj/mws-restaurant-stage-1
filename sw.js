@@ -11,6 +11,7 @@ self.addEventListener('install', function(e){
         caches.open(contentCache).then(function(cache){
             return cache.addAll([
                 '/',
+                '/restaurant.html',
                 '/js/main.js',
                 '/js/restaurant_info.js',
                 '/js/dbhelper.js',
@@ -37,10 +38,15 @@ self.addEventListener('activate', function(e){
 });
 
 self.addEventListener('fetch', function(e) {
-    let url = new URL(e.request.url);  
+    let url = new URL(e.request.url);
+
     if (url.origin === location.origin) {
       if (url.pathname === '/') {
         e.respondWith(caches.match('/'));
+        return;
+      }
+      if (url.pathname.startsWith('/restaurant.html')) {
+        e.respondWith(caches.match('/restaurant.html'));
         return;
       }
       if (url.pathname.startsWith('/images/')) {
