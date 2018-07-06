@@ -12,24 +12,39 @@ class DBHelper {
     return `http://localhost:${port}`;
   }
 
+  static fetchCashedRestaurants(callback, id = '') {
+    var req = indexedDB.open('RESTAURANTS_DB', 2);
+    req.onsuccess = function() { 
+      var db = req.result;  
+      var tx = db.transaction("restaurants", "readwrite");
+      var store = tx.objectStore("restaurants");  
+      var data = store.get('/restaurants/' + id);
+      
+      data.onsuccess = () => { 
+        var restaurants = JSON.parse(data.result.data);         
+          callback(null, restaurants);
+          db.close();            
+        };   
+    }
+  }
+  
   /**
    * Fetch all restaurants.
    */
-  static fetchRestaurants(callback) {
-    let req = new Request(DBHelper.DATABASE_URL + '/restaurants/');  
-    fetch(req)
-      .then((res)=>{
-        if(res.ok){
-          res.json().then((restaurants) => callback(null,restaurants));  
-        } else {
-          const error = (`Request failed. Returned status of ${res.status}`);
-          callback(error, null);
-        }     
-      })
-      .catch((reason)=>{
-        const error = (`Promise rejected. reason: ${reason}`);
-        callback(error, null);
-      });  
+  static fetchRestaurants(callback) {        
+    let req = new Request(DBHelper.DATABASE_URL + '/restaurants/');
+    DBHelper.fetchCashedRestaurants(function(err, data){
+      callback(null, data)
+    });  
+      fetch(req)
+        .then((res)=>{
+          if(res.ok){
+            res.json().then((restaurants) => callback(null,restaurants));  
+          } else {
+            const error = (`Request failed. Returned status of ${res.status}`);
+            callback(error, null);
+          }     
+        });
   }
 
   /**
@@ -37,7 +52,10 @@ class DBHelper {
    */
   static fetchRestaurantById(id, callback) {
     // fetch all restaurants with proper error handling.
-    let req = new Request(DBHelper.DATABASE_URL + '/restaurants/' + id);  
+    let req = new Request(DBHelper.DATABASE_URL + '/restaurants/' + id); 
+    DBHelper.fetchCashedRestaurants(function(err, data){
+      callback(null, data)
+    }, id);   
     fetch(req)
       .then((res)=>{
         if(res.ok){
@@ -45,11 +63,7 @@ class DBHelper {
         } else {
           callback('Restaurant does not exist', null);
         }     
-      })
-      .catch((reason)=>{
-        const error = (`Promise rejected. reason: ${reason}`);
-        callback(error, null);
-      });    
+      }); 
   }
 
   /**
@@ -73,7 +87,7 @@ class DBHelper {
    */
   static fetchRestaurantByNeighborhood(neighborhood, callback) {
     // Fetch all restaurants
-    DBHelper.fetchRestaurants((error, restaurants) => {
+    DBHelper.fetchRestaurants((error, restaurants) => {      
       if (error) {
         callback(error, null);
       } else {
@@ -113,7 +127,7 @@ class DBHelper {
     DBHelper.fetchRestaurants((error, restaurants) => {
       if (error) {
         callback(error, null);
-      } else {
+      } else {       
         // Get all neighborhoods from all restaurants
         const neighborhoods = restaurants.map((v, i) => restaurants[i].neighborhood)
         // Remove duplicates from neighborhoods
@@ -128,10 +142,10 @@ class DBHelper {
    */
   static fetchCuisines(callback) {
     // Fetch all restaurants
-    DBHelper.fetchRestaurants((error, restaurants) => {
+    DBHelper.fetchRestaurants((error, restaurants) => {      
       if (error) {
         callback(error, null);
-      } else {
+      } else {      
         // Get all cuisines from all restaurants
         const cuisines = restaurants.map((v, i) => restaurants[i].cuisine_type)
         // Remove duplicates from cuisines

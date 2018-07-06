@@ -54,18 +54,8 @@ self.addEventListener('fetch', function(e) {
       }
     }
     if(url.origin === DATABASE_URL){
-        var res = getJsonResponse(e.request);
-        console.log(res);
-        e.respondWith(res);
-        return;
+        e.waitUntil(getJsonResponse(e.request));
     }
-    e.respondWith(
-      caches.match(e.request).then(function(response) {
-        return response || fetch(e.request).catch(function(err) {
-                console.log(err);       // fallback mechanism
-            });
-      })
-    );
   });
 
   function getImage(request) {
@@ -82,42 +72,29 @@ self.addEventListener('fetch', function(e) {
     });
   }
 
-  var idbRequest = self.indexedDB.open('RESTAURANTS_DB', 2);
-  idbRequest.onupgradeneeded = function(event){
-      var db = event.target.result;
-      var listStore = db.createObjectStore('restaurants', {keyPath: "url"});      
-  }
-
-  idbRequest.onsuccess = function() {
-    var db = idbRequest.result;
-  }
-
   function getJsonResponse(request) {
       var url = new URL(request.url);      
         return fetch(request).then(function(res){        
             if(res.ok){
-                saveToIDb(res.clone());
+                saveToIDb(url, res.clone());
                 return res;       
             }
-        }).catch(function(err){
-            return respondFromIDb(request);
         });
   }
 
-  function respondFromIDb(request) {   
-        var db = idbRequest.result;
-        var tx = db.transaction("restaurants", "readwrite");
-        var store = tx.objectStore("restaurants");
-        var data = store.get(request.url);    
-        return data;
-  }
+  function saveToIDb(url, response) {        
+    response.json().then(function(json){
+            var idbRequest = indexedDB.open('RESTAURANTS_DB', 2);
+            idbRequest.onsuccess = ()=>{
+                var db = idbRequest.result;
+                var tx = db.transaction("restaurants", "readwrite");
+                var store = tx.objectStore("restaurants");
+               var putReq = store.put({url: url.pathname, data: JSON.stringify(json)});
+               putReq.onsuccess = function(e){
+                   db.close();
+               }
 
-
-  function saveToIDb(response) {      
-    response.json().then(function(json){            
-            var db = idbRequest.result;
-            var tx = db.transaction("restaurants", "readwrite");
-            var store = tx.objectStore("restaurants");
-            store.put({url: response.url, data: json});
+            }          
+          
     });
 }
