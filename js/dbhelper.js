@@ -34,10 +34,7 @@ class DBHelper {
    * Fetch all restaurants.
    */
   static fetchRestaurants(callback) {        
-    let req = new Request(DBHelper.DATABASE_URL + '/restaurants/');
-    DBHelper.fetchCashedRestaurants(function(err, data){
-      callback(null, data)
-    });  
+    let req = new Request(DBHelper.DATABASE_URL + '/restaurants/');   
       fetch(req)
         .then((res)=>{
           if(res.ok){
@@ -46,6 +43,10 @@ class DBHelper {
             const error = (`Request failed. Returned status of ${res.status}`);
             callback(error, null);
           }     
+        }).catch(()=>{
+          DBHelper.fetchCashedRestaurants(function(err, data){
+            callback(null, data)
+          });
         });
   }
 
@@ -54,17 +55,18 @@ class DBHelper {
    */
   static fetchRestaurantById(id, callback) {
     // fetch all restaurants with proper error handling.
-    let req = new Request(DBHelper.DATABASE_URL + '/restaurants/' + id); 
-    DBHelper.fetchCashedRestaurants(function(err, data){
-      callback(null, data)
-    }, id);   
+    let req = new Request(DBHelper.DATABASE_URL + '/restaurants/' + id);    
     fetch(req)
       .then((res)=>{
         if(res.ok){
           res.json().then((restaurant) => callback(null, restaurant));  
-        } else {
+        } else {       
           callback('Restaurant does not exist', null);
         }     
+      }).catch(()=>{
+        DBHelper.fetchCashedRestaurants(function(err, data){
+          callback(null, data)
+        }, id);  
       }); 
   }
 
