@@ -1,0 +1,8 @@
+{
+    "name": "Restaurants Reviews",
+    "short_name": "Restautrants review",
+    "start_url": ".",
+    "display": "standalone",
+    "background_color": "#252831",
+    "description": "Make a review!"
+  }

@@ -20,11 +20,13 @@ class DBHelper {
       var store = tx.objectStore("restaurants");  
       var data = store.get('/restaurants/' + id);
       
-      data.onsuccess = () => { 
-        var restaurants = JSON.parse(data.result.data);         
-          callback(null, restaurants);
-          db.close();            
-        };   
+      data.onsuccess = () => {
+        if(data.result.data){
+            var restaurants = JSON.parse(data.result.data);         
+            callback(null, restaurants);
+            db.close();            
+          };  
+        }        
     }
   }
   
