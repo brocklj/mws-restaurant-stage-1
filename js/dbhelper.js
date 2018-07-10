@@ -13,7 +13,7 @@ class DBHelper {
   }
 
   static fetchCashedRestaurants(callback, id = '') {
-    var req = indexedDB.open('RESTAURANTS_DB', 2);
+    var req = indexedDB.open('RESTAURANTS_DB', 3);
     req.onsuccess = function() { 
       var db = req.result;  
       var tx = db.transaction("restaurants", "readwrite");
@@ -22,10 +22,40 @@ class DBHelper {
       
       data.onsuccess = () => {
         if(data.result.data){
-            var restaurants = JSON.parse(data.result.data);         
+            var restaurants = JSON.parse(data.result.data);
+            DBHelper.fetchCashedRestaurantReviews(function(err, reviews){
+              restaurants.reviews = reviews;
+              callback(null, restaurants);
+              db.close();  
+            }, id);                    
+          };  
+        }        
+    }
+  }
+
+  static fetchCashedRestaurantReviews(callback, id = '') {
+    var req = indexedDB.open('RESTAURANTS_DB', 3);
+    req.onsuccess = function() { 
+      var db = req.result;  
+      var tx = db.transaction("reviews", "readwrite");
+      var store = tx.objectStore("reviews");
+      var index = store.index('url');        
+      var db_url = '?restaurant_id=' + id;
+      
+      var data = index.getAll('/reviews/' + db_url);
+      
+      data.onsuccess = () => {       
+        if(data.result.length){          
+            var restaurants = [];
+            data.result.forEach(function(review){              
+              restaurants.push(JSON.parse(review.data));
+            });  
             callback(null, restaurants);
             db.close();            
-          };  
+          } else{
+            callback("No reviews", null);
+            db.close();   
+          } 
         }        
     }
   }
@@ -59,7 +89,7 @@ class DBHelper {
     fetch(req)
       .then((res)=>{
         if(res.ok){
-          res.json().then((restaurant) => callback(null, restaurant));  
+          res.json().then((data) => {DBHelper.processRestaurantResponse(callback, data)});  
         } else {       
           callback('Restaurant does not exist', null);
         }     
@@ -68,8 +98,24 @@ class DBHelper {
           callback(null, data)
         }, id);  
       }); 
-  }
+  }  
 
+  static processRestaurantResponse(callback, restaurantData){
+    DBHelper.fetchRestaurantReviews(function(err, reviews){      
+      restaurantData.reviews = reviews;
+      callback(null, restaurantData);        
+    }, restaurantData.id);
+  }
+  /**
+   * Fetch restaurant reviews
+   */
+  static fetchRestaurantReviews(callback, id){
+    let req = new Request(DBHelper.DATABASE_URL + '/reviews/?restaurant_id=' + id);
+    fetch(req)
+      .then((res)=>{
+        res.json().then((jsondata)=>callback(null, jsondata));
+      })
+  }
   /**
    * Fetch restaurants by a cuisine type with proper error handling.
    */

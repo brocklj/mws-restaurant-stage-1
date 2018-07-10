@@ -18,10 +18,11 @@ catch (e) {
  * Fetch neighborhoods and cuisines as soon as the page is loaded.
  */
 document.addEventListener('DOMContentLoaded', (event) => {
-  var idbRequest = self.indexedDB.open('RESTAURANTS_DB', 2);
+  var idbRequest = self.indexedDB.open('RESTAURANTS_DB', 3);
   idbRequest.onupgradeneeded = function(e){
     var db = e.target.result;
-    var objectStore = db.createObjectStore('restaurants', {keyPath: 'url'}) 
+    var objectStore1 = db.createObjectStore('restaurants', {keyPath: 'url'});
+    var objectStore2 = db.createObjectStore('reviews', {keyPath: 'url'}); 
   }
   registerServiceWorker();
   fetchNeighborhoods();

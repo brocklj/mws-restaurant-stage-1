@@ -5,6 +5,13 @@ var map;
  * Initialize Google map, called from HTML.
  */
 window.initMap = () => {
+  var idbRequest = self.indexedDB.open('RESTAURANTS_DB', 3);
+  idbRequest.onupgradeneeded = function(e){
+    var db = e.target.result;
+    var objectStore = db.createObjectStore('restaurants', {keyPath: 'url'});
+    var reviewStore = db.createObjectStore('reviews', {keyPath: 'id'});
+    reviewStore.createIndex('url', 'url');  
+  }
   registerServiceWorker();
   fetchRestaurantFromURL((error, restaurant) => {
     if (error) { // Got an error!

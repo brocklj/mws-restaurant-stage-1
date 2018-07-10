@@ -83,24 +83,33 @@ self.addEventListener('fetch', function(e) {
   }
 
   function saveToIdbCache(url, response) {        
-    response.json().then(function(json){
-            var idbRequest = indexedDB.open('RESTAURANTS_DB', 2);
+    response.json().then(function(jsonData){
+            var idbRequest = indexedDB.open('RESTAURANTS_DB', 3);
             idbRequest.onsuccess = ()=>{
                 var db = idbRequest.result;
+                
                 if(url.pathname.startsWith('/reviews/')){
-                    var tx = db.transaction("restaurants", "readwrite");
-                    var store = tx.objectStore("reviews");
-                    var putReq = store.put({url: url.pathname, data: JSON.stringify(json), status: 'cached'});
-
+                    jsonData.forEach(function(review){
+                        var tx = db.transaction("reviews", "readwrite");
+                        var store = tx.objectStore("reviews");                    
+                        
+                        var putReq = store.put({id: review.id, url: url.pathname + url.search, data: JSON.stringify(review), status: 'cached'});
+                            putReq.onsuccess = function(e){
+                                db.close();
+                            }
+                    });                   
+                   
                 }
+
                 if(url.pathname.startsWith('/restaurants/')){
                     var tx = db.transaction("restaurants", "readwrite");
                     var store = tx.objectStore("restaurants");
-                    var putReq = store.put({url: url.pathname, data: JSON.stringify(json));
+                    var putReq = store.put({url: url.pathname, data: JSON.stringify(jsonData)});
+                    putReq.onsuccess = function(e){
+                        db.close();
+                    }
                 }               
-               putReq.onsuccess = function(e){
-                   db.close();
-               }
+               
 
             }          
           
