@@ -1,5 +1,5 @@
-var contentCache = 'restaurant-stage1-v2';
-var imageCache = 'restaurant-stage1-imgs';
+var contentCache = 'restaurant-stage1-v3';
+var imageCache = 'restaurant-stage1-imgs-v3';
 const DATABASE_URL = 'http://localhost:1337';
 var allCaches = [
     contentCache,
@@ -76,20 +76,28 @@ self.addEventListener('fetch', function(e) {
       var url = new URL(request.url);      
         return fetch(request).then(function(res){        
             if(res.ok){
-                saveToIDb(url, res.clone());
+                saveToIdbCache(url, res.clone());
                 return res;       
             }
         });
   }
 
-  function saveToIDb(url, response) {        
+  function saveToIdbCache(url, response) {        
     response.json().then(function(json){
             var idbRequest = indexedDB.open('RESTAURANTS_DB', 2);
             idbRequest.onsuccess = ()=>{
                 var db = idbRequest.result;
-                var tx = db.transaction("restaurants", "readwrite");
-                var store = tx.objectStore("restaurants");
-               var putReq = store.put({url: url.pathname, data: JSON.stringify(json)});
+                if(url.pathname.startsWith('/reviews/')){
+                    var tx = db.transaction("restaurants", "readwrite");
+                    var store = tx.objectStore("reviews");
+                    var putReq = store.put({url: url.pathname, data: JSON.stringify(json), status: 'cached'});
+
+                }
+                if(url.pathname.startsWith('/restaurants/')){
+                    var tx = db.transaction("restaurants", "readwrite");
+                    var store = tx.objectStore("restaurants");
+                    var putReq = store.put({url: url.pathname, data: JSON.stringify(json));
+                }               
                putReq.onsuccess = function(e){
                    db.close();
                }
