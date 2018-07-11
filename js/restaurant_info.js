@@ -1,5 +1,6 @@
 let restaurant;
 var map;
+const new_review_url = 'http://localhost:1337/reviews/';
 
 /**
  * Initialize Google map, called from HTML.
@@ -190,4 +191,51 @@ getParameterByName = (name, url) => {
   if (!results[2])
     return '';
   return decodeURIComponent(results[2].replace(/\+/g, ' '));
+}
+
+onReviewSubmit = () => {
+  var data = {
+  "restaurant_id": getQueryVariable('id'),
+  "name": getValueForId('name'),
+  "rating": getValueForId('rating'),
+  "comments": getValueForId('comments')
+  };
+  if(validateData(data)){
+    fetch(new_review_url, {
+      method: 'POST',
+      body: JSON.stringify(data),
+      headers:{
+        'Content-Type': 'application/json'
+      }
+    }).then((res)=> res.then((data) => console.log(data))); 
+  }
+  
+}
+
+function getValueForId(id){
+  return document.getElementById(id).value;
+}
+
+function validateData(data){
+    var valid = true;
+    if(data.name.length <= 0){
+      alert('input "name" is mandatory');
+      valid = false;
+    }
+    if(data.rating.length <= 0){
+      alert('input "rating" is mandatory');
+      valid = false;
+    }
+    return valid;
+}
+
+function getQueryVariable(variable)
+{
+       var query = window.location.search.substring(1);
+       var vars = query.split("&");
+       for (var i=0;i<vars.length;i++) {
+               var pair = vars[i].split("=");
+               if(pair[0] == variable){return pair[1];}
+       }
+       return(false);
 }

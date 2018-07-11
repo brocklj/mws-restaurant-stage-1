@@ -49,6 +49,18 @@
     <!-- Beginning reviews -->
     <section id="reviews-container" role="document">
       <ul id="reviews-list"></ul>
+      <div>
+        <form>
+        <label for="user">Name</label>
+        <input id="name" name="user">
+        <label for="rating">Rating</label>        
+        <input id="rating" name="rating">
+        <label  for="comment">Comment</label>
+        <textarea id="comments" name="comment"></textarea>
+        <button id="sendReviewButton" type="button" onclick="onReviewSubmit()">Send</button> 
+      </form>       
+
+      </div>
     </section>
     <!-- End reviews -->
   </main>
