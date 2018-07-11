@@ -148,7 +148,11 @@ createReviewHTML = (review) => {
   li.appendChild(name);
 
   const date = document.createElement('p');
-  date.innerHTML = review.date;
+  var dateObject = new Date(review.updatedAt);
+  date.innerHTML = dateObject.getFullYear() + "-" + 
+  ("0" + (dateObject.getMonth() + 1)).slice(-2) + "-" + 
+  ("0" + dateObject.getDate()).slice(-2) + " " + dateObject.getHours() + ":" + 
+  dateObject.getMinutes();
   li.appendChild(date);
 
   const rating = document.createElement('p');
