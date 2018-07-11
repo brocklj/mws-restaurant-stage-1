@@ -12,6 +12,7 @@ window.initMap = () => {
     var objectStore = db.createObjectStore('restaurants', {keyPath: 'url'});
     var reviewStore = db.createObjectStore('reviews', {keyPath: 'id'});
     reviewStore.createIndex('url', 'url');  
+    reviewStore.createIndex('status', 'status');  
   }
   registerServiceWorker();
   fetchRestaurantFromURL((error, restaurant) => {
@@ -207,7 +208,13 @@ onReviewSubmit = () => {
       headers:{
         'Content-Type': 'application/json'
       }
-    }).then((res)=> res.then((data) => console.log(data))); 
+    }).then((res)=>{
+      if(res.ok){
+
+      }
+    }).catch((err)=>{
+
+    }); 
   }
   
 }
