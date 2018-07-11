@@ -210,13 +210,17 @@ onReviewSubmit = () => {
       }
     }).then((res)=>{
       if(res.ok){
-
+        resetReviewForm();
       }
     }).catch((err)=>{
 
     }); 
   }
   
+}
+
+resetReviewForm = () => {
+  document.getElementById('reviewForm').reset();
 }
 
 function getValueForId(id){
