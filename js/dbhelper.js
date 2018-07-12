@@ -241,5 +241,21 @@ class DBHelper {
     );
     return marker;
   }
-
+  /*
+  * Cache data after connection error
+  */
+  static cachePendingReviewData(data, callback) {
+    var req = indexedDB.open('RESTAURANTS_DB', 3);
+    req.onsuccess = ()=>{
+      var db = req.result;
+      var tx = db.transaction("reviews", "readwrite");
+      var store = tx.objectStore("reviews");                    
+      
+      var putReq = store.put({id: "pending", url: data.url, data: JSON.stringify(data), status: 'pending'});
+          putReq.onsuccess = function(e){
+            callback(null, true);
+              db.close();
+          }
+    }
+  }
 }

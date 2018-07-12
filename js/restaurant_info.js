@@ -28,6 +28,7 @@ window.initMap = () => {
       DBHelper.mapMarkerForRestaurant(self.restaurant, self.map);
     }
   });
+  setConnectionCheckInterval();
 }
 
 /**
@@ -122,11 +123,7 @@ fillRestaurantHoursHTML = (operatingHours = self.restaurant.operating_hours) => 
  * Create all reviews HTML and add them to the webpage.
  */
 fillReviewsHTML = (reviews = self.restaurant.reviews) => {
-  const container = document.getElementById('reviews-container');
-  const title = document.createElement('h2');
-  title.innerHTML = 'Reviews';
-  container.appendChild(title);
-
+  document.getElementById('reviews-list').innerHTML = '';
   if (!reviews) {
     const noReviews = document.createElement('p');
     noReviews.innerHTML = 'No reviews yet!';
@@ -137,7 +134,7 @@ fillReviewsHTML = (reviews = self.restaurant.reviews) => {
   reviews.forEach(review => {
     ul.appendChild(createReviewHTML(review));
   });
-  container.appendChild(ul);
+  
 }
 
 /**
@@ -150,11 +147,17 @@ createReviewHTML = (review) => {
   li.appendChild(name);
 
   const date = document.createElement('p');
+  if(!review.updatedAt){
+    date.innerHTML = 'pending in offline cache';
+  }else{
   var dateObject = new Date(review.updatedAt);
   date.innerHTML = dateObject.getFullYear() + "-" + 
   ("0" + (dateObject.getMonth() + 1)).slice(-2) + "-" + 
   ("0" + dateObject.getDate()).slice(-2) + " " + dateObject.getHours() + ":" + 
   dateObject.getMinutes();
+
+  }
+  
   li.appendChild(date);
 
   const rating = document.createElement('p');
@@ -202,25 +205,29 @@ onReviewSubmit = () => {
   "comments": getValueForId('comments')
   };
   if(validateData(data)){
-    fetch(new_review_url, {
-      method: 'POST',
-      body: JSON.stringify(data),
-      headers:{
-        'Content-Type': 'application/json'
-      }
-    }).then((res)=>{
+    postReviewData(JSON.stringify(data))
+    .then((res)=>{
       if(res.ok){
-        resetReviewForm();
-        DBHelper.fetchRestaurantReviews(onReviewsFetched, self.restaurant.id);        
+        resetReviews();
+        DBHelper.fetchRestaurantReviews(onReviewsReFetched, self.restaurant.id);        
       }
-    }).catch((err)=>{
-
-    }); 
+    })
+    .catch((err) => onConnectionError(data)); 
   }
   
 }
 
-resetReviewForm = () => {
+postReviewData = (data) => {
+ return fetch(new_review_url, {
+    method: 'POST',
+    body: data,
+    headers:{
+      'Content-Type': 'application/json'
+    }
+  });
+}
+
+resetReviews = () => {
   document.getElementById('reviewForm').reset();
 }
 
@@ -231,19 +238,91 @@ function getValueForId(id){
 function validateData(data){
     var valid = true;
     if(data.name.length <= 0){
-      alert('input "name" is mandatory');
+     
       valid = false;
     }
     if(data.rating.length <= 0){
-      alert('input "rating" is mandatory');
+     
       valid = false;
     }
+    if(!valid){
+      showInfoMessage('Please, fill * inputs');
+    }
+    
     return valid;
 }
-onReviewsFetched = (err, reviews) => {
-  console.log(reviews);
+onReviewsReFetched = (err, reviews) => {
   if(!err){
     self.restaurant.reviews = reviews;
-    fillReviewsHTML();
+    fillReviewsHTML();   
   }
+}
+onConnectionError = (data) => {
+  showErrorMessage('Connection error');
+  data.url = '/reviews/?restaurant_id=' + self.restaurant.id;
+  DBHelper.cachePendingReviewData(data, (err, success)=>{
+    DBHelper.fetchCachedRestaurantReviews(onReviewsReFetched, self.restaurant.id);
+    showInfoMessage('Offline: Your review has been cached, once you reconnect, the review will be sent.');
+    setConnectionCheckInterval();
+  });
+}
+
+showErrorMessage = (message) => {
+  document.getElementById('messages').innerHTML = '<div class="error">' + message + '</div>';
+}
+showInfoMessage = (message) => {
+  document.getElementById('messages').innerHTML = '<div class="info">' + message + '</div>';
+}
+showSuccessMessage = (message) => {
+  document.getElementById('messages').innerHTML = '<div class="success">' + message + '</div>';
+}
+
+setConnectionCheckInterval = () => {
+  var reconnecting = setInterval(()=>{
+    postPendingData((err, success)=>{
+      if(success){
+        clearInterval(reconnecting);
+        DBHelper.fetchRestaurantReviews(onReviewsReFetched, self.restaurant.id);
+        showSuccessMessage('You are connected, all cached data has been sent.');
+      }
+    });
+  },5000);
+}
+
+postPendingData = (callback) => {
+  var req = indexedDB.open('RESTAURANTS_DB', 3);
+  req.onsuccess = () => {
+    var db = req.result;
+    var tx = db.transaction('reviews', 'readwrite');
+    var store = tx.objectStore('reviews');
+    var index = store.index('status');
+
+    var data = index.getAll('pending');
+    data.onsuccess = () =>{
+      if(data.result.length){
+        data.result.forEach((review)=>{ 
+          console.log(review.data);       
+            postReviewData(review.data).then((res)=>{
+              if(res.ok){
+                iDBRemovePending();
+                callback(false, true)
+              }
+             
+            })
+        });
+      }
+      db.close();  
+    }
+  }
+}
+iDBRemovePending = ()=>{
+
+var req = indexedDB.open('RESTAURANTS_DB', 3);
+req.onsuccess = () => {
+  var db = req.result;
+  var tx = db.transaction('reviews', 'readwrite');
+  var store = tx.objectStore('reviews');
+  store.delete('pending');
+  db.close();  
+}
 }

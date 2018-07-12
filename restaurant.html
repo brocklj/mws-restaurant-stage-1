@@ -48,8 +48,12 @@
     <!-- end restaurant -->
     <!-- Beginning reviews -->
     <section id="reviews-container" role="document">
+      <h2>Reviews</h2>
       <ul id="reviews-list"></ul>
-      <div>
+     
+    </section>
+    <section id="review-form-container">
+      <div id="messages"></div>
         <form id="reviewForm">
         <label for="user">Name*</label>
         <input id="name" name="user">
@@ -59,8 +63,6 @@
         <textarea id="comments" name="comment"></textarea>
         <button id="sendReviewButton" type="button" onclick="onReviewSubmit()">Send</button> 
       </form>       
-
-      </div>
     </section>
     <!-- End reviews -->
   </main>
