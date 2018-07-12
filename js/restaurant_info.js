@@ -196,7 +196,7 @@ getParameterByName = (name, url) => {
 
 onReviewSubmit = () => {
   var data = {
-  "restaurant_id": getQueryVariable('id'),
+  "restaurant_id": self.restaurant.id,
   "name": getValueForId('name'),
   "rating": getValueForId('rating'),
   "comments": getValueForId('comments')
@@ -211,6 +211,7 @@ onReviewSubmit = () => {
     }).then((res)=>{
       if(res.ok){
         resetReviewForm();
+        DBHelper.fetchRestaurantReviews(onReviewsFetched, self.restaurant.id);        
       }
     }).catch((err)=>{
 
@@ -239,14 +240,10 @@ function validateData(data){
     }
     return valid;
 }
-
-function getQueryVariable(variable)
-{
-       var query = window.location.search.substring(1);
-       var vars = query.split("&");
-       for (var i=0;i<vars.length;i++) {
-               var pair = vars[i].split("=");
-               if(pair[0] == variable){return pair[1];}
-       }
-       return(false);
+onReviewsFetched = (err, reviews) => {
+  console.log(reviews);
+  if(!err){
+    self.restaurant.reviews = reviews;
+    fillReviewsHTML();
+  }
 }

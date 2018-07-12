@@ -23,7 +23,7 @@ class DBHelper {
       data.onsuccess = () => {
         if(data.result.data){
             var restaurants = JSON.parse(data.result.data);
-            DBHelper.fetchCashedRestaurantReviews(function(err, reviews){
+            DBHelper.fetchCachedRestaurantReviews(function(err, reviews){
               restaurants.reviews = reviews;
               callback(null, restaurants);
               db.close();  
@@ -33,7 +33,7 @@ class DBHelper {
     }
   }
 
-  static fetchCashedRestaurantReviews(callback, id = '') {
+  static fetchCachedRestaurantReviews(callback, id = '') {
     var req = indexedDB.open('RESTAURANTS_DB', 3);
     req.onsuccess = function() { 
       var db = req.result;  
