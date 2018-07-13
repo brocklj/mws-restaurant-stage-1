@@ -141,13 +141,14 @@ fillReviewsHTML = (reviews = self.restaurant.reviews) => {
  * Create review HTML and add it to the webpage.
  */
 createReviewHTML = (review) => {
-  const li = document.createElement('li');
+  const li = document.createElement('li');  
   const name = document.createElement('p');
   name.innerHTML = review.name;
   li.appendChild(name);
 
   const date = document.createElement('p');
   if(!review.updatedAt){
+    li.setAttribute('class', 'pending' );
     date.innerHTML = 'pending in offline cache';
   }else{
   var dateObject = new Date(review.updatedAt);
@@ -246,7 +247,7 @@ function validateData(data){
       valid = false;
     }
     if(!valid){
-      showInfoMessage('Please, fill * inputs');
+      showInfoMessage('Please, fill all * inputs');
     }
     
     return valid;

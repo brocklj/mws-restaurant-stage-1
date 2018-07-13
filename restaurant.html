@@ -53,15 +53,16 @@
      
     </section>
     <section id="review-form-container">
-      <div id="messages"></div>
-        <form id="reviewForm">
+      <h2>Add review</h2>
+      <div id="messages" class="form-messages"></div>
+        <form id="reviewForm" class="review-form">
         <label for="user">Name*</label>
-        <input id="name" name="user">
+        <input id="name" name="user" placeholder="Name*" aria-label="review input name">
         <label for="rating">Rating*</label>        
-        <input id="rating" type="number" name="rating">
-        <label  for="comment">Comment</label>
-        <textarea id="comments" name="comment"></textarea>
-        <button id="sendReviewButton" type="button" onclick="onReviewSubmit()">Send</button> 
+        <input id="rating" type="number" name="rating" placeholder="Rating*" aria-label="review input rating">
+        <label  for="comment" >Comment</label>
+        <textarea id="comments" placeholder="Comment" name="comment" aria-label="review text your comment"></textarea>
+        <button id="sendReviewButton" type="button" onclick="onReviewSubmit()">Send Review</button> 
       </form>       
     </section>
     <!-- End reviews -->

@@ -260,7 +260,7 @@ nav h1 a {
 #reviews-container {
   padding: 30px 40px 80px;
 }
-#reviews-container h2 {
+#reviews-container h2, #review-form-container h2 {
   color: #f58500;
   font-size: 24pt;
   font-weight: 300;
@@ -273,7 +273,7 @@ nav h1 a {
 }
 #reviews-list li {
   background-color: #fff;
-    border: 2px solid #f3f3f3;
+  border: 2px solid #f3f3f3;
   display: block;
   list-style-type: none;
   margin: 0 0 30px;
@@ -282,12 +282,57 @@ nav h1 a {
   position: relative;
   width: 85%;
 }
+#reviews-list li.pending{
+  background-color:rgba(208, 192, 192, 0.44);
+  border: 2px dashed #f3f3f3;
+}
 #reviews-list li p {
   margin: 0 0 10px;
 }
 #restaurant-hours td {
   color: #666;
 }
+.form-messages {
+  margin: 0.5em 0 0.5em 0;
+}
+.form-messages div {
+  padding: 0.5rem;
+}
+.form-messages .info{
+  background: #a0d2fd;
+}
+.form-messages .error{
+  background: #f59292;
+}
+.form-messages .success{
+  background: #bff17c;
+}
+.review-form{
+  display: block;
+  padding: 0.5em 0 2em 0;
+  margin-bottom: 4em;
+}
+.review-form label {
+  display: none;
+}
+.review-form input{
+clear: both;
+float: none;
+display: block;
+padding: 0.2rem;
+width: 95%;
+margin: 1em 0 1em 0;
+}
+.review-form textarea{
+  padding: 0.2rem;
+  width: 95%;
+  margin: 1em 0 1em 0;
+}
+.review-form #sendReviewButton{
+  float: right;
+  margin-right: 4%;
+}
+
 
 @media all and (min-width: 970px) {
   #restaurant-container, #reviews-container, #review-form-container {
