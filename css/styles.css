@@ -190,6 +190,20 @@ nav h1 a {
   text-decoration: none;
   text-transform: uppercase;
 }
+#restaurants-list li a.favorite-btn{
+  background-color: transparent;
+  color: black;
+}
+
+#restaurants-list li a.favorite-btn:hover{
+  background-color: orange;
+  color: #fff;
+  cursor: pointer; 
+}
+
+#restaurants-list li a.favorite-btn.favorite{
+  background-color:  orange;
+}
 
 /* ====================== Restaurant Details ====================== */
 .inside header {

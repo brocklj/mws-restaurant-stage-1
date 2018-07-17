@@ -198,6 +198,15 @@ createRestaurantHTML = (restaurant) => {
   more.href = DBHelper.urlForRestaurant(restaurant);
   li.append(more)
 
+  const favorite = document.createElement('a');
+  favorite.innerHTML = 'Favorite';
+  favorite.setAttribute('aria-label', restaurant.is_favorite? 'Unmark "' + restaurant.name + '"as favorite' : 'Mark "' + restaurant.name + '"as favorite');
+  favorite.setAttribute('onclick', 'toggleFavorite('+ restaurant.id +')');
+  favorite.setAttribute('id', 'restaurant-'+ restaurant.id +'');
+  favorite.setAttribute('class', 'favorite-btn ' + (restaurant.is_favorite? 'favorite': '') + '' );  
+  favorite.setAttribute('data-isfavorite', restaurant.is_favorite? 'true' : 'false');
+  li.append(favorite);
+
   return li;
 }
 
@@ -226,4 +235,14 @@ showMap = (el) => {
     el.innerHTML = 'Show map';
 
   }
+}
+
+toggleFavorite = (id) => {
+    let element = document.getElementById('restaurant-' + id);
+    const initialState = element.getAttribute('data-isfavorite'); 
+    console.log(initialState);
+    DBHelper.setRestaurantFavorite(id, initialState, (err, success)=>{
+
+    });
+
 }
