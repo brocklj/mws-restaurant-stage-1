@@ -333,6 +333,16 @@ margin: 1em 0 1em 0;
   margin-right: 4%;
 }
 
+.show-main-map{
+  position: relative;
+  top: 30px;
+}
+
+.show-map {
+  position: relative;
+  left: 50%;
+  top: -39px;
+}
 
 @media all and (min-width: 970px) {
   #restaurant-container, #reviews-container, #review-form-container {

@@ -15,11 +15,12 @@
   <header>
     <nav>
       <h1><a href="/">Restaurant Reviews</a></h1>
+      <button class='show-main-map' onclick="showMap(this)">Show Map</button>
     </nav>
   </header>
 
   <main id="maincontent">
-    <section id="map-container" aria-hidden="true">
+    <section id="map-container" aria-hidden="true" style="display: none">
       <div id="map" aria-label="location" role="application"></div>
     </section>
     <section>

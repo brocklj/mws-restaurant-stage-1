@@ -23,8 +23,9 @@
     </nav>
     <!-- Beginning breadcrumb -->
     <ul id="breadcrumb" role="navigation" aria-label="Breadcrumb" >
-      <li><a href="/">Home</a></li>
+      <li><a href="/">Home</a></li>            
     </ul>
+    <button class='show-map' onclick="showMap(this)">Show Map</button>
     <!-- End breadcrumb -->
     <!-- End nav -->
   </header>
@@ -33,8 +34,8 @@
   <!-- Beginning main -->
   <main id="maincontent" aria-hidden="false">
     <!-- Beginning map -->
-    <section id="map-container"  aria-hidden="true">
-      <div id="map" aria-label="location" role="application" ></div>
+    <section id="map-container"  aria-hidden="true"  style="display: none">
+      <div id="map" aria-label="location" role="application"></div>
     </section>
     <!-- End map -->
     <!-- Beginning restaurant -->

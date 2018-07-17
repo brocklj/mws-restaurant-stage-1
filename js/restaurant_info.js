@@ -327,3 +327,15 @@ req.onsuccess = () => {
   db.close();  
 }
 }
+
+showMap = (el) => {
+  let mapContainer = document.getElementById('map-container');
+  if(mapContainer.style.display === 'none'){
+    mapContainer.style.display = 'block';
+    el.innerHTML = 'Hide map';
+  } else {
+    mapContainer.style.display = 'None';
+    el.innerHTML = 'Show map';
+
+  }
+}
