@@ -258,4 +258,19 @@ class DBHelper {
           }
     }
   }
+
+  static setRestaurantFavorite(id, state, callback) {
+    let req = new Request(DBHelper.DATABASE_URL + '/restaurants/'+ id +'/?is_favorite='+ (state == 'false'? 'true': 'false') +'');
+
+    fetch(req, {
+      method: 'PUT'
+      }).then((state)=>{
+      if(state.ok){
+        callback(null, state);
+      }      
+    }).catch((e)=>{
+      callback(e, null);
+    });
+  
+  }
 }

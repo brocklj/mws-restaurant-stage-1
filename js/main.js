@@ -242,7 +242,9 @@ toggleFavorite = (id) => {
     const initialState = element.getAttribute('data-isfavorite'); 
     console.log(initialState);
     DBHelper.setRestaurantFavorite(id, initialState, (err, success)=>{
-
+      const value = initialState === 'false'? 'favorite' : '';
+      element.setAttribute('class', 'favorite-btn '+ value);
+      element.setAttribute('data-isfavorite', (initialState=='true'? 'false': 'true'));
     });
 
 }
