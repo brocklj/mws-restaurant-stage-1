@@ -264,9 +264,9 @@ class DBHelper {
 
     fetch(req, {
       method: 'PUT'
-      }).then((state)=>{
-      if(state.ok){
-        callback(null, state);
+      }).then((res)=>{
+      if(res.ok){
+        callback(null, res);
       }      
     }).catch((e)=>{
       callback(e, null);
